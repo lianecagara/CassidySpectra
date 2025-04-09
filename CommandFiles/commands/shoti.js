@@ -1,8 +1,9 @@
+import Shoti from "shoti";
 export const meta = {
   name: "shoti",
   description: "Send a random Shoti video",
   author: "0xVoid",
-  version: "1.0.0",
+  version: "1.0.1",
   usage: "{prefix}{name}",
   category: "bold",
   permissions: [0],
@@ -12,37 +13,49 @@ export const meta = {
   otherNames: ["shoti"],
   icon: "😋",
 };
-
-import Shoti from "shoti";
-import { defineEntry } from "@cass/define";
-
-const shoti = new Shoti("$shoti-b04f8c279e");
-
 export async function entry({
-  output,
-  money,
-  input,
-  styler,
-  cancelCooldown,
-  Inventory,
+  output
 }) {
   try {
-    const data = await shoti.getShoti({ type: "link" });
+    const shoti = new Shoti("$shoti-b04f8c279e");
+    const data = await shoti.getShoti();
+    const err = data
+    const content = data?.content
+    const region = data?.region ?? "";
+    const instagram = data?.user?.instagram ?? "";
+    const nickname = data?.user?.nickname ?? "";
+    const signature = data?.user?.signature ?? "";
+    const twitter = data?.user?.twitter ?? "";
+    const username = data?.user?.username ?? "";
 
-    const message = `Country: ${data?.region|| "N/A"}\n` +
-    `Instagram: ${data?.user?.instagram || "N/A"}\n` +
-                    `Nickname: ${data?.user?.nickname || "N/A"}\n` +
-                    `Signature: ${data?.user?.signature || "N/A"}\n` +
-                    `Twitter: ${data?.user?.twitter || "N/A"}\n` +
-                    `Username: ${data?.user?.username || "N/A"}`;
+    let msg = ``;
+
+    if (region !== '') {
+      msg += `Country: ${region}\n`;
+    }
+    if (instagram !== '') {
+      msg += `Instagram: ${instagram}\n`;
+    }
+    if (nickname !== '') {
+      msg += `Nickname: ${nickname}\n`;
+    }
+    if (signature !== '') {
+      msg += `Signature: ${signature}\n`;
+    }
+    if (twitter !== '') {
+      msg += `Twitter: ${twitter}\n`;
+    }
+    if (username !== '') {
+      msg += `Username: ${username}\n`;
+    }
 
     await output.reply({
-      body: message,
-      attachment: await global.utils.getStreamFromURL(data?.content),
+      body: msg.trim(),
+      attachment: await global.utils.getStreamFromURL(content)
     });
-  } catch (err) {
+  } catch (error) {
     await output.reply({
-      body: `Failed to fetch Shoti video: ${err.message || err}`,
+      body: `Failed to fetch Shoti video: ${err.message || err}`
     });
   }
 };
